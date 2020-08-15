@@ -1,0 +1,35 @@
+public class CaseTriggerHandler {
+    public static void updateOpenCaseAccount(List<Case> caseListUpdated){
+        Map<Id,List<Case>> csMap = new Map<Id,List<Case>>();    
+        
+        for(Case csNew : caseListUpdated){
+            if(csMap.containsKey(csNew.AccountId)){
+                List<Case> csListTemp = csMap.get(csNew.AccountId);
+                csListTemp.add(csNew);
+                csMap.put(csNew.AccountId,csListTemp);                
+            }else{
+                csMap.put(csNew.AccountId,new List<Case>{csNew});
+            }   
+        }
+        
+        if(!csMap.isEmpty()){
+            List<Account> accUpdateList = new List<Account>();
+            for(Account acctemp: [SElECT Id,Name,Has_Open_Case__c,(SELECT Id,isClosed FROM Cases) FROM Account WHERE Id IN :csMap.keySet()]){
+                Boolean openCaseBool = false;
+                Account accObj = new Account();
+                accObj.Id = acctemp.Id;
+                for(Case cs : acctemp.cases){
+                    if(cs.isClosed == false){
+                        openCaseBool = true;
+                        break;
+                    }                      
+                }
+                accObj.Has_Open_Case__c = openCaseBool;
+                accUpdateList.add(accObj);
+            }
+            if(!accUpdateList.isEmpty()){
+                Update accUpdateList;
+            }
+        }        
+    }
+}
