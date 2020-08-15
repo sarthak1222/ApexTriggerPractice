@@ -1,0 +1,8 @@
+trigger CaseTrigger on Case (after insert,after update,after delete,after undelete) {    
+    if(trigger.isInsert || trigger.isUpdate || trigger.isUndelete){
+    	CaseTriggerHandler.updateOpenCaseAccount(Trigger.New);        
+    }
+    if(trigger.isDelete){
+    	CaseTriggerHandler.updateOpenCaseAccount(Trigger.old);        
+    }    
+}
